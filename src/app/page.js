@@ -1,101 +1,63 @@
-import Image from "next/image";
+"use client"
 
-export default function Home() {
+import { useState } from "react";
+import Item from "../components/Product";
+import ShoppingCart from "../components/Cart";
+import Offers from "../components/Discount";
+import Payment from "../components/Checkout";
+
+export default function Storefront() {
+  // Product catalog available for purchase
+  const catalog = [
+    { id: "P001", title: "Laptop", cost: 1000.00, group: "Electronics" },
+    { id: "P002", title: "Phone", cost: 500.00, group: "Electronics" },
+    { id: "P003", title: "T-Shirt", cost: 20.00, group: "Fashion" },
+  ];
+
+  const [shoppingCart, setShoppingCart] = useState([]);
+  const [availableDiscounts] = useState([
+    { title: "Buy 1 Get 1 Free", group: "Fashion", dealType: "BOGO" },
+    { title: "10% Off on Electronics", group: "Electronics", dealType: "percentage", discount: 10 },
+  ]);
+
+  const handleAddToCart = (item, quantity) => {
+    setShoppingCart((previousCart) => {
+      const existingItem = previousCart.find(cartItem => cartItem.product.id === item.id);
+      if (existingItem) {
+        return previousCart.map(cartItem =>
+          cartItem.product.id === item.id ? { ...cartItem, quantity: cartItem.quantity + quantity } : cartItem
+        );
+      }
+      return [...previousCart, { product: item, quantity }];
+    });
+  };
+
+  const handleRemoveFromCart = (itemId, quantity) => {
+    setShoppingCart((previousCart) => {
+      const itemInCart = previousCart.find(cartItem => cartItem.product.id === itemId);
+      if (itemInCart.quantity > quantity) {
+        return previousCart.map(cartItem =>
+          cartItem.product.id === itemId ? { ...cartItem, quantity: cartItem.quantity - quantity } : cartItem
+        );
+      } else {
+        return previousCart.filter(cartItem => cartItem.product.id !== itemId);
+      }
+    });
+  };
+
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="https://nextjs.org/icons/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/app/page.js
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+    <div>
+      <div className="navbar w-full">
+        <h1>Simple E-Commerce Platform</h1>
+      </div>
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="https://nextjs.org/icons/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+      <h2>Available Products</h2>
+      {catalog.map((item) => (
+        <Item key={item.id} product={item} addToCart={handleAddToCart} />
+      ))}
+      <ShoppingCart cartItems={shoppingCart} removeFromCart={handleRemoveFromCart} />
+      <Offers discounts={availableDiscounts} />
+      <Payment cartItems={shoppingCart} discounts={availableDiscounts} />
     </div>
   );
 }
