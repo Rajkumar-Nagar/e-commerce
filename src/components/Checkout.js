@@ -14,7 +14,7 @@ export default function Payment({ cartItems, discounts }) {
 
     discounts.forEach((offer) => {
       cartItems.forEach((item) => {
-        if (offer.category === item.product.category) {
+        if (offer.group === item.product.group) {
           if (offer.dealType === "BOGO" && item.quantity >= 2) {
             totalCost -= Math.floor(item.quantity / 2) * item.product.cost;
           } else if (offer.dealType === "percentage") {
@@ -35,16 +35,55 @@ export default function Payment({ cartItems, discounts }) {
   const totalInChosenCurrency = totalUSD * exchangeRates[currency];
 
   return (
-    <div>
+    <div className="payment-summary">
       <h2>Payment Summary</h2>
-      <p>Total (USD): ${totalUSD.toFixed(2)}</p>
+      <p>Total (USD): <span>${totalUSD.toFixed(2)}</span></p>
       <label>Convert currency: </label>
       <select value={currency} onChange={handleCurrencySwitch}>
         <option value="USD">USD</option>
         <option value="EUR">EUR</option>
         <option value="GBP">GBP</option>
       </select>
-      <p>Total in {currency}: {totalInChosenCurrency.toFixed(2)} {currency}</p>
+      <p>Total in {currency}: <span>{totalInChosenCurrency.toFixed(2)} {currency}</span></p>
+
+      <style jsx>{`
+        .payment-summary {
+          padding: 20px;
+          border: 1px solid #ccc;
+          border-radius: 8px;
+          background-color: white;
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+          margin-top: 20px;
+        }
+
+        h2 {
+          color: #4caf50;
+          margin-bottom: 10px;
+        }
+
+        p {
+          font-size: 16px;
+          margin: 5px 0;
+        }
+
+        label {
+          font-weight: bold;
+          margin-right: 10px;
+        }
+
+        select {
+          padding: 5px;
+          border: 1px solid #ccc;
+          border-radius: 4px;
+          margin-bottom: 10px;
+          cursor: pointer;
+        }
+
+        span {
+          font-weight: bold;
+          color: #333;
+        }
+      `}</style>
     </div>
   );
 }
